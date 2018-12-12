@@ -14,5 +14,9 @@
                 <property name="activeJobsThreshold" value="1"/>
             </bean>
         </property>
+        <!-- Restart node after critical failure like OOM -->
+        <property name="failureHandler">
+            <bean class="org.apache.ignite.failure.RestartProcessFailureHandler"/>
+        </property>
     </bean>
 </beans>
