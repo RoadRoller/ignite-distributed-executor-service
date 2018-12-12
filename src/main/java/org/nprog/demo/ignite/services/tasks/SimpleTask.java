@@ -28,12 +28,14 @@ public class SimpleTask implements Callable<String> {
 
     @Override
     public String call() throws Exception {
+        logger.info("Task {} started", taskId);
         for (int i = 0; i <= 20; i++) {
             pubSubService.publishTaskProgress(new TaskProgressMessage(taskId, (double) i / 20));
             Thread.sleep(1000);
         }
         String result = "It's a simple task result. Passed argument: " + argument;
         logger.info(result);
+        logger.info("Task {} finished", taskId);
         return result;
     }
 }
