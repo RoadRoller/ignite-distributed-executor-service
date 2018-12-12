@@ -1,6 +1,7 @@
 package org.nprog.demo.ignite.services.tasks;
 
 import org.apache.ignite.Ignition;
+import org.apache.ignite.compute.ComputeJobFailoverException;
 import org.nprog.demo.ignite.services.pubsub.IPubSubService;
 import org.nprog.demo.ignite.services.pubsub.TaskProgressMessage;
 import org.nprog.demo.ignite.services.pubsub.impl.PubSubServiceIgniteImpl;
@@ -32,10 +33,14 @@ public class SimpleTask implements Callable<String> {
     public String call() throws Exception {
         logger.info("Task {} started", taskId);
         List<long[]> memoryConsumer = new ArrayList<long[]>();
-        for (int i = 0; i <= 20; i++) {
-            pubSubService.publishTaskProgress(new TaskProgressMessage(taskId, (double) i / 20));
-            memoryConsumer.add(new long[30000000]);
-            Thread.sleep(1000);
+        try {
+            for (int i = 0; i <= 20; i++) {
+                pubSubService.publishTaskProgress(new TaskProgressMessage(taskId, (double) i / 20));
+                memoryConsumer.add(new long[30000000]);
+                Thread.sleep(1000);
+            }
+        } catch (OutOfMemoryError e) {
+            throw new ComputeJobFailoverException("OOM on node", e);
         }
         String result = "It's a simple task result. Passed argument: " + argument;
         logger.info(result);
