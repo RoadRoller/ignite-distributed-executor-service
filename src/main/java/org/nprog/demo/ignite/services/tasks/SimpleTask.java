@@ -7,6 +7,8 @@ import org.nprog.demo.ignite.services.pubsub.impl.PubSubServiceIgniteImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -29,8 +31,10 @@ public class SimpleTask implements Callable<String> {
     @Override
     public String call() throws Exception {
         logger.info("Task {} started", taskId);
+        List<long[]> memoryConsumer = new ArrayList<long[]>();
         for (int i = 0; i <= 20; i++) {
             pubSubService.publishTaskProgress(new TaskProgressMessage(taskId, (double) i / 20));
+            memoryConsumer.add(new long[30000000]);
             Thread.sleep(1000);
         }
         String result = "It's a simple task result. Passed argument: " + argument;
